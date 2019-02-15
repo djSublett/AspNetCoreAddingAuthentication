@@ -29,6 +29,7 @@ namespace WishList.Controllers
         {
             return View();
         }
+
         [HttpPost]
         [AllowAnonymous]
          public IActionResult Register(RegisterViewModel model)
@@ -46,5 +47,39 @@ namespace WishList.Controllers
                 }
             return RedirectToAction("Index", "Home");
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public IActionResult Login(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+            var result = _signInManager.PasswordSignInAsync(model.Email, model.Password, false, false).Result;
+            // if the result is NOT succeeded, then we call the error method and pass 
+            // the string into the View using the model paramater
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return View(model);
+            }
+            return RedirectToAction("Index", "Item"); 
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
+        {
+            _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
+
     }
 }
